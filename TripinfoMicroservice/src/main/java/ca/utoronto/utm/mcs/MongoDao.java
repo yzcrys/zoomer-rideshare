@@ -58,5 +58,11 @@ public class MongoDao {
 		System.out.println("Success! Inserted document");
 	}
 
-
+	public void addTripConfirm(String driver, String passenger, Long startTime) {
+		collection.insertOne(new Document()
+				.append("_id", new ObjectId())
+				.append("driver", driver)
+				.append("passenger", passenger)
+				.append("startTime", startTime));
+	}
 }
