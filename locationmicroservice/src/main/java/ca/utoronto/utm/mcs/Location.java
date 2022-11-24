@@ -17,7 +17,8 @@ public class Location extends Endpoint {
 
     @Override
     public void handleGet(HttpExchange r) throws IOException, JSONException {
-        
+
+        System.out.println("GET USER LOC GET USER LOC");
         String[] params = r.getRequestURI().toString().split("/");
         if (params.length != 3 || params[2].isEmpty()) {
             this.sendStatus(r, 400);
@@ -62,7 +63,7 @@ public class Location extends Endpoint {
 
     @Override
     public void handlePatch(HttpExchange r) throws IOException, JSONException {
-
+        System.out.println("UDPATER SLOC UPDATE USER LOC");
         String params[] = r.getRequestURI().toString().split("/");
         if (params.length != 3 || params[2].isEmpty()) {
             this.sendStatus(r, 400);

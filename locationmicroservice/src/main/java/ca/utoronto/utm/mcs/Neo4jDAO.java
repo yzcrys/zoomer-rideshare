@@ -40,6 +40,7 @@ public class Neo4jDAO {
     }
 
     public Result getUserByUid(String uid) {
+        System.out.println("Getting user by id");
         String query = "MATCH (n: user {uid: '%s' }) RETURN n";
         query = String.format(query, uid);
         return this.session.run(query);
@@ -86,4 +87,14 @@ public class Neo4jDAO {
         query = String.format(query, roadname1, roadname2);
         return this.session.run(query);
     }
-} 
+
+    public Result getNearbyDriver(String uid, Integer radius) {
+
+        String query = "MATCH (a:user {uid: '%s'}), (b:user {is_driver: true}) " +
+                "WHERE point.distance(point({x: a.longitude, y: a.latitude}), point({x: b.longitude, y: b.latitude})) < %d " +
+                "AND a.uid <> b.uid " +
+                "RETURN b AS driver";
+        query = String.format(query, uid, radius);
+        return this.session.run(query);
+    }
+}

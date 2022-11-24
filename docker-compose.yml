@@ -77,7 +77,7 @@ services:
   neo4j:
     container_name: neo4j
     image: neo4j:latest
-    platform: linux/amd64
+    platform: linux/arm64/v8
     environment:
       - NEO4J_dbms_security_procedures_unrestricted=gds.*
       - NEO4J_dbms_security_procedures_allowlist=gds.*
