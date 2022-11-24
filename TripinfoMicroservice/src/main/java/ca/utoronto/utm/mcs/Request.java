@@ -11,6 +11,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 
+import com.mongodb.util.JSON;
 import com.sun.net.httpserver.HttpExchange;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,8 +45,12 @@ public class Request extends Endpoint {
         Integer radius = body.getInt("radius");
 
         try {
-            dao.addTripRequest(uid, radius);
-            this.sendStatus(r, 200);
+            JSONObject obj = dao.addTripRequest(uid, radius);
+
+            if (obj == null)
+                this.sendStatus(r, 400);
+            else
+                this.sendStatus(r, 200);
         } catch (Exception e) {
 
             e.printStackTrace();
