@@ -58,5 +58,23 @@ public class MongoDao {
 		System.out.println("Success! Inserted document");
 	}
 
+	// PATCH trip/_id
+	public Integer updateTripInfo(String _id, Integer distance, Long endTime, Integer timeElapsed, Integer discount, Integer totalCost, Float driverPayout) {
+		BasicDBObject query = new BasicDBObject();
+		BasicDBObject update = new BasicDBObject();
+		query.put("_id", new ObjectId(_id));
+		update.put("distance", distance);
+		update.put("endTime", endTime);
+		update.put("timeElapsed", timeElapsed);
+		update.put("discount", discount);
+		update.put("totalCost", totalCost);
+		update.put("driverPayout", driverPayout);
 
+		DBObject dbObj = (DBObject) collection.findOneAndUpdate(query, update);
+
+		if (dbObj.equals(null)) {
+			return 400;
+		}
+		return 200;
+	}
 }
