@@ -70,7 +70,7 @@ public class Navigation extends Endpoint {
 
                     if (i == 0) {
                         streetName.put("time", 0);
-                        streetName.put("is_traffic", relList.get(i - 1).asMap().get("has_traffic"));
+                        streetName.put("is_traffic", relList.get(i).asMap().get("has_traffic"));
                     }
                     else {
                         streetName.put("time", relList.get(i - 1).asMap().get("travel_time"));
