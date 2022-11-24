@@ -68,14 +68,13 @@ public class MongoDao {
 
 	// *** implement database operations here *** //
 
-	public JSONObject addTripRequest(String uid, Integer radius) throws URISyntaxException, IOException, InterruptedException {
+	public String addTripRequest(String uid, Integer radius) throws URISyntaxException, IOException, InterruptedException {
 
 		HttpClient client = HttpClient.newHttpClient();
-		HttpResponse<String> response = sendGetReq(client, "http://locationmicroservice:8000/nearbyDriver/" + uid + "?radius=" + radius);
+		HttpResponse<String> response = sendGetReq(client, "http://locationmicroservice:8000/location/nearbyDriver/" + uid + "?radius=" + radius);
 
-		if (response.statusCode() != 200) {
-			System.out.println("status code is " + response.statusCode() + ", uri is " + "http://locationmicroservice:8000/nearbyDriver/" + uid + "?radius=" + radius);
-			return null;
+		if (response.statusCode() != 200 || response.body() == null) {
+			return Integer.toString(response.statusCode());
 		}
 
 		JSONObject obj = null;
@@ -85,16 +84,13 @@ public class MongoDao {
 		catch (JSONException e)
 		{
 			System.out.println("JSON exceptin");
-			return null;
+			return "500";
 		}
 
-		if (obj != null) {
-			System.out.println("MongoDao addTripRequest: " + obj.toString());
-			return obj;
-		}
+		if (obj == null)
+			return Integer.toString(response.statusCode());
 
-		System.out.println("object from nearbydriver is null");
-		return null;
+		return obj.toString();
 	}
 
 }

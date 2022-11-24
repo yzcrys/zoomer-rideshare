@@ -45,14 +45,14 @@ public class Request extends Endpoint {
         Integer radius = body.getInt("radius");
 
         try {
-            JSONObject obj = dao.addTripRequest(uid, radius);
+            String objString = dao.addTripRequest(uid, radius);
 
-            if (obj == null)
-                this.sendStatus(r, 400);
-            else
-                this.sendStatus(r, 200);
+            if(objString.length() == 3)
+                this.sendStatus(r, Integer.parseInt(objString));
+            else {
+                this.sendResponse(r, new JSONObject(objString), 200);
+            }
         } catch (Exception e) {
-
             e.printStackTrace();
             this.sendStatus(r, 500);
         }
