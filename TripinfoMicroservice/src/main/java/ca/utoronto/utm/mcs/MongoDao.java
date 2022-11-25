@@ -1,18 +1,11 @@
 package ca.utoronto.utm.mcs;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
-import com.mongodb.client.result.UpdateResult;
-import org.bson.BsonDocument;
-import org.bson.BsonInt64;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -20,8 +13,6 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.sql.Time;
-import java.util.Arrays;
 
 import static com.mongodb.client.model.Filters.eq;
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
@@ -77,6 +68,9 @@ public class MongoDao {
 		if (response.statusCode() != 200 || response.body() == null) {
 			return Integer.toString(response.statusCode());
 		}
+		return response.body();
+	}
+
 	public void addTripConfirm(String driver, String passenger, Integer startTime) {
 		collection.insertOne(new Document()
 				.append("_id", new ObjectId())

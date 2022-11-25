@@ -100,7 +100,7 @@ public class Neo4jDAO {
 
     public Result getNavigation(String driverUid, String passengerUid) {
 
-        String query = "MATCH(a:user{uid: '1'}), (b:user{uid: '3'})\n" +
+        String query = "MATCH(a:user{uid: '%s'}), (b:user{uid: '%s'})\n" +
                 "MATCH(r1:road{name: a.street}), (r2:road{name: b.street}),\n" +
                 "    path = allShortestPaths((r1)-[:ROUTE_TO*]->(r2))\n" +
                 "RETURN path AS shortestPath,\n" +
