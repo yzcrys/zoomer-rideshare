@@ -20,36 +20,22 @@ import static java.net.http.HttpRequest.BodyPublishers.noBody;
 public class MongoDao {
 
 	public MongoCollection<Document> collection;
-	public MongoClient mongoClient;
-	public ClientSession session;
-	public MongoDatabase database;
+	private final MongoClient mongoClient;
+	private final ClientSession session;
+	private final MongoDatabase database;
 
 	public MongoDao() {
         // TODO: 
         // Connect to the mongodb database and create the database and collection. 
         // Use Dotenv like in the DAOs of the other microservices.
 
-//		String uri = "mongodb://root:123456@" + System.getenv("MONGODB_ADDR") + ":27017/?maxPoolSize=20&w=majority";
 		String uri = "mongodb://root:123456@host.docker.internal:27017";
-		System.out.println("the conn string: " + uri);
 
-		try (MongoClient mongoClient = MongoClients.create(uri)) {
-			this.mongoClient = MongoClients.create(uri);
-			this.session = mongoClient.startSession();
-			this.database = mongoClient.getDatabase("trips");
-			this.collection = this.database.getCollection("trips");
-
-//			try {
-//				Bson command = new BsonDocument("ping", new BsonInt64(1));
-//				Document commandResult = database.runCommand(command);
-//				System.out.println("Connected successfully to server.");
-//			} catch (MongoException me) {
-//				System.err.println("An error occurred while attempting to run a command: " + me);
-//			}
-		}catch (MongoException me) {
-				System.err.println("An error occurred" + me);
-			}
-
+		MongoClient mongoClient = MongoClients.create(uri);
+		this.mongoClient = MongoClients.create(uri);
+		this.session = mongoClient.startSession();
+		this.database = mongoClient.getDatabase("trips");
+		this.collection = this.database.getCollection("trips");
 	}
 
 	public HttpResponse<String> sendGetReq(HttpClient client, String uriEndpoint) throws URISyntaxException, IOException, InterruptedException {
@@ -71,12 +57,16 @@ public class MongoDao {
 		return response.body();
 	}
 
-	public void addTripConfirm(String driver, String passenger, Integer startTime) {
-		collection.insertOne(new Document()
+	public Document addTripConfirm(String driver, String passenger, Integer startTime) {
+
+		Document doc = new Document()
 				.append("_id", new ObjectId())
 				.append("driver", driver)
 				.append("passenger", passenger)
-				.append("startTime", startTime));
+				.append("startTime", startTime);
+
+		collection.insertOne(doc);
+		return doc;
 	}
 
 	// PATCH trip/_id
