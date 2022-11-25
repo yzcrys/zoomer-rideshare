@@ -1,6 +1,7 @@
 package ca.utoronto.utm.mcs;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.bson.Document;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -34,11 +35,11 @@ public class Confirm extends Endpoint {
         Integer startTime = body.getInt("startTime");
 
         System.out.println("about to try confirm dao");
+        Document doc;
         try {
-            dao.addTripConfirm(driver, passenger, startTime);
-            this.sendStatus(r, 200);
+            doc = dao.addTripConfirm(driver, passenger, startTime);
+            this.sendResponse(r, new JSONObject(doc.toJson()), 200);
         } catch (Exception e) {
-
             e.printStackTrace();
             this.sendStatus(r, 500);
         }

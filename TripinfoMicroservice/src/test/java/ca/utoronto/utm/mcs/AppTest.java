@@ -56,20 +56,22 @@ public class AppTest {
         sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"req2\", \"is_driver\" : true }");
         sendPostReq( client, "http://localhost:8002/trip/request", "{ \"uid\": \"req1\", \"radius\": 2 }");
         sendHTTPReq("PATCH", client, "http://localhost:8004/location/req1", "{\n" +
-                " 'longitude': 50.1,\n" +
-                " 'latitude': 50.1,\n" +
+                " 'longitude': 300.1,\n" +
+                " 'latitude': 300.1,\n" +
                 " 'street': 'Street req1'\n" +
                 "}");
         sendHTTPReq("PATCH", client, "http://localhost:8004/location/req2", "{\n" +
-                " 'longitude': 51.2,\n" +
-                " 'latitude': 51.2,\n" +
+                " 'longitude': 301.1,\n" +
+                " 'latitude': 301.1,\n" +
                 " 'street': 'Street req2'\n" +
                 "}");
 
-        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/nearbyDriver/req1?radius=5");
+        HttpResponse response = sendPostReq(client, "http://localhost:8002/trip/request", "{\n" +
+                "\t\"uid\": \"req1\", \n" +
+                "\t\"radius\": 2\n" +
+                "}");
         String receivedResponse = response.body().toString();
-//        System.out.println(receivedResponse + ", " + response.statusCode());
-        String correctResponse = "{\"data\":{\"req2\":{\"street\":\"Street req2\",\"latitude\":51.2,\"longitude\":51.2}},\"status\":\"OK\"}";
+        String correctResponse = "{\"data\":{\"req2\":{\"street\":\"Street req2\",\"latitude\":301.1,\"longitude\":301.1},\"reqf2\":{\"street\":\"Street req2\",\"latitude\":301.1,\"longitude\":301.1}},\"status\":\"OK\"}";
         assertTrue(receivedResponse.equals(correctResponse) && response.statusCode() == 200);
     }
 
@@ -80,19 +82,53 @@ public class AppTest {
         sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"reqf2\", \"is_driver\" : true }");
         sendPostReq( client, "http://localhost:8002/trip/request", "{ \"uid\": \"reqf1\", \"radius\": 2 }");
         sendHTTPReq("PATCH", client, "http://localhost:8004/location/reqf1", "{\n" +
-                " 'longitude': 1.1,\n" +
-                " 'latitude': 1.1,\n" +
+                " 'longitude': 300.1,\n" +
+                " 'latitude': 300.1,\n" +
                 " 'street': 'Street req1'\n" +
                 "}");
         sendHTTPReq("PATCH", client, "http://localhost:8004/location/reqf2", "{\n" +
-                " 'longitude': 2.2,\n" +
-                " 'latitude': 2.2,\n" +
+                " 'longitude': 301.1,\n" +
+                " 'latitude': 301.1,\n" +
                 " 'street': 'Street req2'\n" +
                 "}");
 
-        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/nearbyDriver/re12q1?radius=1");
+        HttpResponse response = sendPostReq(client, "http://localhost:8002/trip/request", "{\n" +
+                "\t\"uid\": \"req43tdgdfgdfg1\", \n" +
+                "\t\"radius\": 2\n" +
+                "}");
         String receivedResponse = response.body().toString();
-//        System.out.println(receivedResponse + ", " + response.statusCode());
+        System.out.println(receivedResponse + ", " + response.statusCode());
         assertTrue(receivedResponse.equals("{\"status\":\"NOT FOUND\"}") && response.statusCode() == 404);
+    }
+
+    @Test
+    public void tripConfirmPass() throws URISyntaxException, IOException, InterruptedException, JSONException {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse response = sendPostReq(client, "http://localhost:8002/trip/confirm", "{\n" +
+                "\t\"driver\": \"ab\", \n" +
+                "\t\"passenger\": \"ba\",\n" +
+                "\t\"startTime\": 1669342329\n" +
+                "}");
+
+        String receivedResponse = response.body().toString();
+        System.out.println(receivedResponse + ", " + response.statusCode());
+        assertTrue(!receivedResponse.isEmpty() && response.statusCode() == 200);
+    }
+
+    @Test
+    public void tripConfirmFail() throws URISyntaxException, IOException, InterruptedException, JSONException {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpResponse response = sendPostReq(client, "http://localhost:8002/trip/confirm", "{\n" +
+                "\t\"drivser\": \"ab\", \n" +
+                "\t\"passenger\": \"ba\",\n" +
+                "\t\"startTime\": 1669342329\n" +
+                "}");
+
+        String receivedResponse = response.body().toString();
+        assertTrue(receivedResponse.equals("{\"status\":\"BAD REQUEST\"}") && response.statusCode() == 400);
     }
 }
