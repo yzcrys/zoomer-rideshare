@@ -70,7 +70,7 @@ public class MongoDao {
 	}
 
 	// PATCH trip/_id
-	public Integer updateTripInfo(String _id, Integer distance, Long endTime, Integer timeElapsed, Integer discount, Integer totalCost, Float driverPayout) {
+	public int updateTripInfo(String _id, Integer distance, Integer endTime, Integer timeElapsed, Integer discount, Double totalCost, Double driverPayout) {
 		BasicDBObject query = new BasicDBObject();
 		BasicDBObject update = new BasicDBObject();
 		query.put("_id", new ObjectId(_id));
@@ -83,8 +83,8 @@ public class MongoDao {
 
 		DBObject dbObj = (DBObject) collection.findOneAndUpdate(query, update);
 
-		if (dbObj.equals(null)) {
-			return 400;
+		if (dbObj == null || dbObj.equals(null)) {
+			return 404;
 		}
 		return 200;
 	}
