@@ -20,11 +20,6 @@ public class Register extends Endpoint {
     @Override
     public void handlePost(HttpExchange r) throws IOException, JSONException {
 
-        System.out.println("handle register user");
-        if (Utils.convert(r.getRequestBody()).isEmpty()) {
-            this.sendStatus(r, 500);
-            return;
-        }
 
         JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
         String fields[] = {"name", "email", "password"};
