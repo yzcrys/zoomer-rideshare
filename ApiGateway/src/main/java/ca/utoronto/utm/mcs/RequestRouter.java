@@ -62,7 +62,6 @@ public class RequestRouter implements HttpHandler {
 			case "GET" -> {
 				try {
 					HttpResponse response = sendGetReq(client, uri);
-//					System.out.println(response.statusCode() + ", " + response.body().toString());
 					this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
 
 				} catch (URISyntaxException | InterruptedException | JSONException e) {
@@ -83,7 +82,8 @@ public class RequestRouter implements HttpHandler {
 			}
 			case "DELETE", "POST", "PATCH" -> {
 				try {
-					HttpResponse response = sendHTTPReq(method, client, uri, r.getRequestBody().toString());
+					String reqBody = Utils.convert(r.getRequestBody());
+					HttpResponse response = sendHTTPReq(method, client, uri, reqBody);;
 					this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
 				} catch (URISyntaxException | JSONException e) {
 					throw new RuntimeException(e);
