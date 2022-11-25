@@ -67,7 +67,6 @@ public class MongoDao {
 	}
 
 	// *** implement database operations here *** //
-
 	public String addTripRequest(String uid, Integer radius) throws URISyntaxException, IOException, InterruptedException {
 
 		HttpClient client = HttpClient.newHttpClient();
@@ -92,5 +91,4 @@ public class MongoDao {
 
 		return obj.toString();
 	}
-
 }
