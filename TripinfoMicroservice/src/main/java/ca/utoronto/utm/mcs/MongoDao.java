@@ -85,7 +85,7 @@ public class MongoDao {
 				.append("startTime", startTime));
 	}
 
-	// GET /trip/passenger/uid (get all trips that this passenger has)
+	// PATCH trip/_id
 	public Integer updateTripInfo(String _id, Integer distance, Long endTime, Integer timeElapsed, Integer discount, Integer totalCost, Float driverPayout) {
 		BasicDBObject query = new BasicDBObject();
 		BasicDBObject update = new BasicDBObject();
@@ -104,5 +104,4 @@ public class MongoDao {
 		}
 		return 200;
 	}
-
 }
