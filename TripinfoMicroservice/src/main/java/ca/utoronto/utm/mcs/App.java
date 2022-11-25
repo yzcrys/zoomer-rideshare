@@ -10,6 +10,8 @@ public class App {
         HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
 
         // TODO: Add server contexts here. Do not set executors for the server, you shouldn't need them.
+        server.createContext("/trip/request", new Request());
+        server.createContext("/trip/confirm", new Confirm());
 
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
