@@ -4,8 +4,10 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import com.mongodb.client.*;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.net.URI;
@@ -87,5 +89,23 @@ public class MongoDao {
 			return 404;
 		}
 		return 200;
+	}
+
+	public JSONArray getAllTrips(String uid) {
+
+		FindIterable<Document> found = this.collection.find(Filters.eq("driver", uid));
+		try {
+			JSONArray res = new JSONArray();
+
+			for (Document doc : found) {
+
+				doc.put("_id",doc.getObjectId("_id").toString());
+				doc.remove("driver");
+				res.put(doc);
+			}
+			return res;
+		} catch (Exception e) {
+			throw e;
+		}
 	}
 }
