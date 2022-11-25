@@ -65,4 +65,17 @@ public class PostgresDAO {
             this.st.execute(query);
         }
     }
+
+    public int registerUser(String name, String email, String password) throws SQLException {
+        String query;
+        if (name != null && email != null && password != null) {
+            query = "INSERT INTO users (prefer_name, email, password, rides) VALUES ('%s', '%s', '%s', 0);";
+            query = String.format(query, name, email, password);
+            System.out.println("returing query");
+
+            this.st.execute(query);
+            return 200;
+        }
+        return 400;
+    }
 }

@@ -80,11 +80,34 @@ public class RequestRouter implements HttpHandler {
 					throw new RuntimeException(e);
 				}
 			}
-			case "DELETE", "POST", "PATCH" -> {
+			case "POST" -> {
 				try {
 					String reqBody = Utils.convert(r.getRequestBody());
+					HttpResponse response = sendPostReq(client, uri, reqBody);
+
+					if (response.body() == null || response.body().toString().isEmpty())
+						this.sendStatus(r, response.statusCode());
+					else
+						this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
+
+				} catch (URISyntaxException | JSONException e) {
+					throw new RuntimeException(e);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			case "DELETE", "PATCH" -> {
+				try {
+					String reqBody = Utils.convert(r.getRequestBody());
+					System.out.println("before sending request");
 					HttpResponse response = sendHTTPReq(method, client, uri, reqBody);;
-					this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
+					System.out.println("apigateway response: " + response.body().toString());
+					System.out.println("\napigateway status code: " + response.statusCode());
+					if (response.body() == null || response.body().toString().isEmpty())
+						this.sendStatus(r, response.statusCode());
+					else
+						this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
+
 				} catch (URISyntaxException | JSONException e) {
 					throw new RuntimeException(e);
 				} catch (InterruptedException e) {
@@ -134,11 +157,18 @@ public class RequestRouter implements HttpHandler {
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
 
-	// for all except for get and put
-	public HttpResponse<String> sendHTTPReq(String method, HttpClient client, String uriEndPoint, String body) throws URISyntaxException, IOException, InterruptedException {
+	public HttpResponse<String> sendPostReq(HttpClient client, String uriEndPoint, String body) throws URISyntaxException, IOException, InterruptedException {
 		return client.send(HttpRequest.newBuilder()
 				.uri(new URI(uriEndPoint))
 				.headers("Content-Type", "application/json")
+				.method("POST", HttpRequest.BodyPublishers.ofString(body))
+				.build(), HttpResponse.BodyHandlers.ofString());
+	}
+
+	// for all except for get and put and post
+	public HttpResponse<String> sendHTTPReq(String method, HttpClient client, String uriEndPoint, String body) throws URISyntaxException, IOException, InterruptedException {
+		return client.send(HttpRequest.newBuilder()
+				.uri(new URI(uriEndPoint))
 				.method(method, HttpRequest.BodyPublishers.ofString(body))
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
