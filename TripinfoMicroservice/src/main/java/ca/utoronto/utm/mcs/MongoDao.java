@@ -11,11 +11,20 @@ import org.bson.BsonInt64;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.sql.Time;
 import java.util.Arrays;
 
 import static com.mongodb.client.model.Filters.eq;
+import static java.net.http.HttpRequest.BodyPublishers.noBody;
 
 public class MongoDao {
 
@@ -52,14 +61,22 @@ public class MongoDao {
 
 	}
 
-	// *** implement database operations here *** //
-
-	public void addTripRequest(String uid, Integer radius) {
-		//
-
-		System.out.println("Success! Inserted document");
+	public HttpResponse<String> sendGetReq(HttpClient client, String uriEndpoint) throws URISyntaxException, IOException, InterruptedException {
+		return client.send(HttpRequest.newBuilder()
+				.uri(new URI(uriEndpoint))
+				.method("GET", noBody())
+				.build(), HttpResponse.BodyHandlers.ofString());
 	}
 
+	// *** implement database operations here *** //
+	public String addTripRequest(String uid, Integer radius) throws URISyntaxException, IOException, InterruptedException {
+
+		HttpClient client = HttpClient.newHttpClient();
+		HttpResponse<String> response = sendGetReq(client, "http://locationmicroservice:8000/location/nearbyDriver/" + uid + "?radius=" + radius);
+
+		if (response.statusCode() != 200 || response.body() == null) {
+			return Integer.toString(response.statusCode());
+		}
 	public void addTripConfirm(String driver, String passenger, Integer startTime) {
 		collection.insertOne(new Document()
 				.append("_id", new ObjectId())
