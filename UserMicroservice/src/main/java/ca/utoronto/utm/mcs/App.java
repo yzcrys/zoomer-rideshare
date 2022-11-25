@@ -14,6 +14,7 @@ public class App {
 
         // TODO: Add server contexts here. Do not set executors for the server, you shouldn't need them.
         server.createContext("/user/register", new Register());
+        server.createContext("/user/login", new Login());
 
         server.start();
         System.out.printf("Server started on port %d...\n", PORT);
