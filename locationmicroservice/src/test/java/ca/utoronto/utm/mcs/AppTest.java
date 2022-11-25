@@ -90,7 +90,7 @@ public class AppTest {
                 " 'latitude': 3.1,\n" +
                 " 'street': 'Street 3'\n" +
                 "}");
-        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/nearbyDriver/112?radius=1");
+        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/nearbyDriver/112?radius=1");
         String receivedResponse = response.body().toString();
 //        System.out.println(receivedResponse);
         assertTrue(receivedResponse.equals("{\"status\":\"NOT FOUND\"}") && response.statusCode() == 404);
@@ -128,12 +128,12 @@ public class AppTest {
         sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street nav3\", \"hasTraffic\" : false }");
         sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street nav4\", \"hasTraffic\" : false }");
 
-        sendHTTPReq("POST", client, "http://localhost:8000/location/hasRoute", "{ \"roadName1\": \"Street nav1\", \"roadName2\": \"Street nav4\", \"hasTraffic\" : true, \"time\": 50 }");
-        sendHTTPReq("POST", client, "http://localhost:8000/location/hasRoute", "{ \"roadName1\": \"Street nav1\", \"roadName2\": \"Street nav2\", \"hasTraffic\" : true, \"time\": 4 }");
-        sendHTTPReq("POST", client, "http://localhost:8000/location/hasRoute", "{ \"roadName1\": \"Street nav2\", \"roadName2\": \"Street nav3\", \"hasTraffic\" : true, \"time\": 7 }");
-        sendHTTPReq("POST", client, "http://localhost:8000/location/hasRoute", "{ \"roadName1\": \"Street nav3\", \"roadName2\": \"Street nav4\", \"hasTraffic\" : true, \"time\": 3 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street nav1\", \"roadName2\": \"Street nav4\", \"hasTraffic\" : true, \"time\": 50 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street nav1\", \"roadName2\": \"Street nav2\", \"hasTraffic\" : true, \"time\": 4 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street nav2\", \"roadName2\": \"Street nav3\", \"hasTraffic\" : true, \"time\": 7 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street nav3\", \"roadName2\": \"Street nav4\", \"hasTraffic\" : true, \"time\": 3 }");
 
-        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/navigation/nav1?passengerUid=nav4");
+        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/navigation/nav1?passengerUid=nav4");
         String receivedResponse = response.body().toString();
         String correctResponse = "{\"data\":{\"route\":[{\"street\":\"Street nav1\",\"is_traffic\":true,\"time\":0},{\"street\":\"Street nav4\",\"is_traffic\":true,\"time\":50}],\"total_time\":\"50\"},\"status\":\"OK\"}";
 //        System.out.println(receivedResponse);
@@ -143,7 +143,7 @@ public class AppTest {
     @Test
     public void getNavigationFail() throws URISyntaxException, IOException, InterruptedException, JSONException {
         HttpClient client = HttpClient.newHttpClient();
-        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/navigation/nav1123123?passengerUid=nav4");
+        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/navigation/nav1123123?passengerUid=nav4");
         String receivedResponse = response.body().toString();
         assertTrue(receivedResponse.equals("{\"status\":\"NOT FOUND\"}") && response.statusCode() == 404);
     }
