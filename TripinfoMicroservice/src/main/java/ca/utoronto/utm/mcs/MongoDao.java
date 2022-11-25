@@ -4,10 +4,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonDocument;
 import org.bson.BsonInt64;
@@ -21,8 +18,11 @@ import java.util.Arrays;
 import static com.mongodb.client.model.Filters.eq;
 
 public class MongoDao {
-	
+
 	public MongoCollection<Document> collection;
+	public MongoClient mongoClient;
+	public ClientSession session;
+	public MongoDatabase database;
 
 	public MongoDao() {
         // TODO: 
@@ -30,12 +30,14 @@ public class MongoDao {
         // Use Dotenv like in the DAOs of the other microservices.
 
 //		String uri = "mongodb://root:123456@" + System.getenv("MONGODB_ADDR") + ":27017/?maxPoolSize=20&w=majority";
-		String connectionString = "mongodb://root:123456@" + System.getenv("MONGODB_ADDR") + ":27017/root?&ssl=false";
-		System.out.println("the conn string: " + connectionString);
+		String uri = "mongodb://root:123456@host.docker.internal:27017";
+		System.out.println("the conn string: " + uri);
 
-		try (MongoClient mongoClient = MongoClients.create(connectionString)) {
-			MongoDatabase database = mongoClient.getDatabase("trip");
-			collection = database.getCollection("trips");
+		try (MongoClient mongoClient = MongoClients.create(uri)) {
+			this.mongoClient = MongoClients.create(uri);
+			this.session = mongoClient.startSession();
+			this.database = mongoClient.getDatabase("trips");
+			this.collection = this.database.getCollection("trips");
 
 //			try {
 //				Bson command = new BsonDocument("ping", new BsonInt64(1));
@@ -58,7 +60,7 @@ public class MongoDao {
 		System.out.println("Success! Inserted document");
 	}
 
-	public void addTripConfirm(String driver, String passenger, Long startTime) {
+	public void addTripConfirm(String driver, String passenger, Integer startTime) {
 		collection.insertOne(new Document()
 				.append("_id", new ObjectId())
 				.append("driver", driver)
