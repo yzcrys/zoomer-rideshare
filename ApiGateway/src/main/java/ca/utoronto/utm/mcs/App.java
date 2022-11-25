@@ -9,9 +9,12 @@ public class App {
 
 	public static void main(String[] args) throws IOException {
 		HttpServer server = HttpServer.create(new InetSocketAddress("0.0.0.0", PORT), 0);
-        
+
         // TODO: Add server contexts here. Do not set executors for the server, you shouldn't need them.
-        
+		server.createContext("/location", new RequestRouter());
+		server.createContext("/trip", new RequestRouter());
+		server.createContext("/user", new RequestRouter());
+
         server.start();
 		System.out.printf("Server started on port %d...\n", PORT);
 	}
