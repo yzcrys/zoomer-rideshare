@@ -73,7 +73,7 @@ public class AppTest {
                 " 'latitude': 2.0,\n" +
                 " 'street': 'Street 2'\n" +
                 "}");
-        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/nearbyDriver/1?radius=2");
+        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/nearbyDriver/1?radius=2");
         String receivedResponse = response.body().toString();
                 System.out.println(receivedResponse);
         String correctResponse = "{\"data\":{\"2\":{\"street\":\"Street 2\",\"latitude\":2,\"longitude\":2}},\"status\":\"OK\"}";
