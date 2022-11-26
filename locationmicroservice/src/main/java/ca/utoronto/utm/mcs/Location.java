@@ -17,13 +17,15 @@ public class Location extends Endpoint {
 
     @Override
     public void handleGet(HttpExchange r) throws IOException, JSONException {
-
-        System.out.println("GET USER LOC GET USER LOC");
+        System.out.println("\n \n This is a test. Location GET \n \n");
         String[] params = r.getRequestURI().toString().split("/");
+
         if (params.length != 3 || params[2].isEmpty()) {
             this.sendStatus(r, 400);
             return;
         }
+
+        System.out.println("Location: " + params.toString());
 
         try {
             String uid = params[2];

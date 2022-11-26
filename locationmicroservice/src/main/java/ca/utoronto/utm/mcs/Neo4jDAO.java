@@ -94,17 +94,16 @@ public class Neo4jDAO {
                 "WHERE point.distance(point({x: a.longitude, y: a.latitude}), point({x: b.longitude, y: b.latitude})) < %d " +
                 "AND a.uid <> b.uid " +
                 "RETURN b AS driver";
-        query = String.format(query, uid, radius);
+        query = String.format(query, uid, radius + 1);
         return this.session.run(query);
     }
 
     public Result getNavigation(String driverUid, String passengerUid) {
 
         String query = "MATCH(a:user{uid: '%s'}), (b:user{uid: '%s'})\n" +
-                "MATCH(r1:road{name: a.street}), (r2:road{name: b.street}),\n" +
-                "    path = allShortestPaths((r1)-[:ROUTE_TO*]->(r2))\n" +
-                "RETURN path AS shortestPath,\n" +
-                "    reduce(EstimatedTime=0, r in relationships(path) | EstimatedTime+r.travel_time) AS time\n" +
+                "MATCH(r1:road {name:a.street})\n" +
+                "MATCH p = (r1)-[:ROUTE_TO*]->(r2: road {name: b.street})\n" +
+                "RETURN p, REDUCE(s=0, i in relationships(p) | s+i.travel_time ) as time\n" +
                 "ORDER BY time ASC\n" +
                 "LIMIT 1";
         query = String.format(query, driverUid, passengerUid);
