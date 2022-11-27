@@ -33,28 +33,55 @@ public class Request extends Endpoint {
     @Override
     public void handlePost(HttpExchange r) throws IOException, JSONException {
 
-        JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
-        String fields[] = {"uid", "radius"};
-        Class<?> fieldClasses[] = {String.class, Integer.class};
-        if (!validateFields(body, fields, fieldClasses) || body.getInt("radius") < 0) {
-            this.sendStatus(r, 400);
-            return;
-        }
-
-        String uid = body.getString("uid");
-        Integer radius = body.getInt("radius");
-
         try {
-            String objString = dao.addTripRequest(uid, radius);
-
-            if(objString.length() == 3)
-                this.sendStatus(r, Integer.parseInt(objString));
-            else {
-                this.sendResponse(r, new JSONObject(objString), 200);
+            JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
+            String fields[] = {"uid", "radius"};
+            Class<?> fieldClasses[] = {String.class, Integer.class};
+            if (!validateFields(body, fields, fieldClasses) || body.getInt("radius") < 0) {
+                this.sendStatus(r, 400);
+                return;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.sendStatus(r, 500);
+
+            String uid = body.getString("uid");
+            Integer radius = body.getInt("radius");
+
+            try {
+                String objString = dao.addTripRequest(uid, radius);
+
+                if (objString == null || objString.isEmpty()) {
+                    this.sendStatus(r, 404);
+                    return;
+                }
+
+                JSONObject response;
+                JSONObject res;
+                try {
+                    response = new JSONObject(objString);
+                    res = new JSONObject();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    this.sendStatus(r, 400);
+                    return;
+                }
+
+                res.put("data", response.getJSONObject("data").names());
+
+                if (objString.length() == 3)
+                    this.sendStatus(r, Integer.parseInt(objString));
+                else {
+                    this.sendResponse(r, res, 200);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                this.sendStatus(r, 500);
+            }
+        }catch (JSONException e) {
+            if (Utils.convert(r.getRequestBody()).isEmpty())
+                this.sendStatus(r, 404);
+            else {
+                e.printStackTrace();
+                this.sendStatus(r, 400);
+            }
         }
     }
 }
