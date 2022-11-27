@@ -175,4 +175,22 @@ public class MongoDao {
 		}
 		return response.body();
 	}
+
+	public JSONArray getAllTrips(String uid) {
+
+		FindIterable<Document> found = this.collection.find(Filters.eq("driver", uid));
+		try {
+			JSONArray res = new JSONArray();
+
+			for (Document doc : found) {
+
+				doc.put("_id",doc.getObjectId("_id").toString());
+				doc.remove("driver");
+				res.put(doc);
+			}
+			return res;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 }

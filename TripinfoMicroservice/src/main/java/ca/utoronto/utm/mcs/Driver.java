@@ -33,7 +33,6 @@ public class Driver extends Endpoint {
                 this.sendStatus(r, 404);
                 return;
             }
-
             JSONObject data = new JSONObject();
             JSONObject trips = new JSONObject();
 
