@@ -17,71 +17,72 @@ public class User extends Endpoint {
 
 	@Override
 	public void handleGet(HttpExchange r) throws IOException, JSONException {
-		
-		// check if request url isn't malformed
-		String[] splitUrl = r.getRequestURI().getPath().split("/");
-		if (splitUrl.length != 3) {
-			this.sendStatus(r, 400);
-			return;
-		}
-
-		// check if uid given is integer, return 400 if not
-		String uidString = splitUrl[2];
-        int uid;
 		try {
-			uid = Integer.parseInt(uidString);
+			// check if request url isn't malformed
+			String[] splitUrl = r.getRequestURI().getPath().split("/");
+			if (splitUrl.length != 3) {
+				this.sendStatus(r, 400);
+				return;
+			}
+
+			// check if uid given is integer, return 400 if not
+			String uidString = splitUrl[2];
+			int uid;
+			try {
+				uid = Integer.parseInt(uidString);
+			} catch (Exception e) {
+				e.printStackTrace();
+				this.sendStatus(r, 400);
+				return;
+			}
+
+			// make query and get required data, return 500 if error
+			ResultSet rs;
+			boolean resultHasNext;
+			try {
+				rs = this.dao.getUserData(uid);
+				resultHasNext = rs.next();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				this.sendStatus(r, 500);
+				return;
+			}
+
+			// check if user was found, return 404 if not found
+			if (!resultHasNext) {
+				this.sendStatus(r, 404);
+				return;
+			}
+
+			// get data
+			String name;
+			String email;
+			int rides;
+			Boolean isDriver;
+			try {
+				name = rs.getString("name");
+				email = rs.getString("email");
+				rides = rs.getInt("rides");
+				isDriver = rs.getBoolean("isdriver");
+			} catch (SQLException e) {
+				e.printStackTrace();
+				this.sendStatus(r, 500);
+				return;
+			}
+
+			// making the response
+			JSONObject resp = new JSONObject();
+			JSONObject data = new JSONObject();
+			data.put("name", name);
+			data.put("email", email);
+			data.put("rides", rides);
+			data.put("isDriver", isDriver);
+			resp.put("data", data);
+
+			this.sendResponse(r, resp, 200);
 		} catch (Exception e) {
-            e.printStackTrace();
-			this.sendStatus(r, 400);
-			return;
-		}
-
-		// make query and get required data, return 500 if error
-		ResultSet rs;
-		boolean resultHasNext;
-		try {
-			rs = this.dao.getUserData(uid);
-			resultHasNext = rs.next();
-		} 
-		catch (SQLException e) {
-            e.printStackTrace();
 			this.sendStatus(r, 500);
-			return;
 		}
-
-		// check if user was found, return 404 if not found
-		if (!resultHasNext) {
-			this.sendStatus(r, 404);
-			return;
-		}
-
-		// get data
-		String name;
-		String email;
-		int rides;
-		Boolean isDriver;
-		try {
-			name = rs.getString("name");
-			email = rs.getString("email");
-			rides = rs.getInt("rides");
-			isDriver = rs.getBoolean("isdriver");
-		}
-		catch (SQLException e) {
-            e.printStackTrace();
-			this.sendStatus(r, 500);
-			return;
-		}
-
-		// making the response
-		JSONObject resp = new JSONObject();
-		JSONObject data = new JSONObject();
-		data.put("name", name);
-		data.put("email", email);
-		data.put("rides", rides);
-		data.put("isDriver", isDriver);
-		resp.put("data", data);
-
-		this.sendResponse(r, resp, 200);
 	}
 
     /**
