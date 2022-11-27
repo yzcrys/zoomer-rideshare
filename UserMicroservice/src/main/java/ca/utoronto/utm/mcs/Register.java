@@ -20,33 +20,48 @@ public class Register extends Endpoint {
     @Override
     public void handlePost(HttpExchange r) throws IOException, JSONException {
 
-
-        JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
-        String fields[] = {"name", "email", "password"};
-
-        Class<?> fieldClasses[] = {String.class, String.class, String.class};
-        if (!validateFields(body, fields, fieldClasses)) {
-//            System.out.println("invalid fields for register user");
-            this.sendStatus(r, 400);
-            return;
-        }
-
-        String name = body.getString("name");
-        String email = body.getString("email");
-        String password = body.getString("password");
-
-        // make query and get required data, return 500 if error
-        Integer rs;
         try {
-            System.out.println("try register user, " + name + ", " + password);
-            rs = this.dao.registerUser(name, email, password);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            this.sendStatus(r, 500);
-            return;
-        }
+            JSONObject body = null;
+            try {
+                body = new JSONObject(Utils.convert(r.getRequestBody()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                if (body == null) {
+                    this.sendStatus(r, 400);
+                    return;
+                }
+//                System.out.println(body.toString());
+                this.sendStatus(r, 400);
+                return;
+            }
 
-        this.sendStatus(r, rs);
+            String fields[] = {"name", "email", "password"};
+
+            Class<?> fieldClasses[] = {String.class, String.class, String.class};
+            if (!validateFields(body, fields, fieldClasses)) {
+                //            System.out.println("invalid fields for register user");
+                this.sendStatus(r, 400);
+                return;
+            }
+
+            String name = body.getString("name");
+            String email = body.getString("email");
+            String password = body.getString("password");
+
+            // make query and get required data, return 500 if error
+            Integer rs;
+            try {
+                System.out.println("try register user, " + name + ", " + password);
+                rs = this.dao.registerUser(name, email, password);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                this.sendStatus(r, 500);
+                return;
+            }
+
+            this.sendStatus(r, rs);
+        } catch (Exception e) {
+            this.sendStatus(r, 500);
+        }
     }
 }

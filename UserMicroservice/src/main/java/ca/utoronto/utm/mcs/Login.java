@@ -21,47 +21,61 @@ public class Login extends Endpoint {
 
     @Override
     public void handlePost(HttpExchange r) throws IOException, JSONException {
-
-        JSONObject body = new JSONObject(Utils.convert(r.getRequestBody()));
-        String fields[] = {"email", "password"};
-
-        Class<?> fieldClasses[] = {String.class, String.class};
-        if (!validateFields(body, fields, fieldClasses)) {
-            this.sendStatus(r, 400);
-            return;
-        }
-
-        String email = body.getString("email");
-        String password = body.getString("password");
-
-        // make query and get required data, return 500 if error
-        ResultSet rs;
-        boolean resultHasNext;
         try {
-            rs = this.dao.loginUser(email, password);
-            resultHasNext = rs.next();
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            this.sendStatus(r, 500);
-            return;
-        }
+            JSONObject body = null;
+            try {
+                body = new JSONObject(Utils.convert(r.getRequestBody()));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                if (body == null) {
+                    this.sendStatus(r, 400);
+                    return;
+                }
+//                System.out.println(body.toString());
+                this.sendStatus(r, 400);
+                return;
+            }
 
-        if (!resultHasNext) {
-            this.sendStatus(r, 404);
-            return;
-        }
+            String fields[] = {"email", "password"};
 
-        try {
-            if (rs.getString("password").equals(password))
-                this.sendStatus(r, 200);
-            else
-                this.sendStatus(r, 401);
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
+            Class<?> fieldClasses[] = {String.class, String.class};
+            if (!validateFields(body, fields, fieldClasses)) {
+                this.sendStatus(r, 400);
+                return;
+            }
+
+            String email = body.getString("email");
+            String password = body.getString("password");
+
+            // make query and get required data, return 500 if error
+            ResultSet rs;
+            boolean resultHasNext;
+            try {
+                rs = this.dao.loginUser(email, password);
+                resultHasNext = rs.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                this.sendStatus(r, 500);
+                return;
+            }
+
+            if (!resultHasNext) {
+                this.sendStatus(r, 404);
+                return;
+            }
+
+            try {
+                if (rs.getString("password").equals(password))
+                    this.sendStatus(r, 200);
+                else
+                    this.sendStatus(r, 401);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                this.sendStatus(r, 500);
+                return;
+            }
+        }catch (Exception e) {
             this.sendStatus(r, 500);
-            return;
         }
     }
 }
