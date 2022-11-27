@@ -42,8 +42,8 @@ public class Navigation extends Endpoint {
         }
 
         try {
-            String driverUid = params[0];
-            String passengerUid = params[1];
+            String passengerUid = params[0];
+            String driverUid = params[1];
 
             Result result = this.dao.getNavigation(driverUid, passengerUid);
 

@@ -53,13 +53,18 @@ public class Request extends Endpoint {
                     return;
                 }
 
-                JSONObject response;
+                JSONObject response = null;
                 JSONObject res;
                 try {
                     response = new JSONObject(objString);
                     res = new JSONObject();
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    if (response == null) {
+                        this.sendStatus(r, 404);
+                        return;
+                    }
+                    System.out.println(response.toString());
                     this.sendStatus(r, 400);
                     return;
                 }
@@ -76,12 +81,8 @@ public class Request extends Endpoint {
                 this.sendStatus(r, 500);
             }
         }catch (JSONException e) {
-            if (Utils.convert(r.getRequestBody()).isEmpty())
-                this.sendStatus(r, 404);
-            else {
-                e.printStackTrace();
-                this.sendStatus(r, 400);
-            }
+            e.printStackTrace();
+            this.sendStatus(r, 400);
         }
     }
 }
