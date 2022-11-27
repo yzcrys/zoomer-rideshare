@@ -25,8 +25,11 @@ public class Trip extends Endpoint {
         try {
             System.out.println("RIGHT HERE \n \n");
             String[] split1 = r.getRequestURI().toString().split("/");
+            System.out.println("RIGHT HERE \n \n");
             System.out.println("\n\n" + split1[2] + ", " + split1.length + "\n\n");
+            System.out.println("RIGHT HERE \n \n");
             if (split1.length != 3 || split1[2].isEmpty()) {
+                System.out.println("RIGHT HERE \n \n");
                 this.sendStatus(r, 400);
                 return;
             }

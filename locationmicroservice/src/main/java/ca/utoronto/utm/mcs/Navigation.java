@@ -51,10 +51,10 @@ public class Navigation extends Endpoint {
                 Record record = result.next();
 
                 Value time = record.get("time");
-                Path shortestPath = record.get("shortestPath").asPath();
+                Path p = record.get("p").asPath();
 
-                Iterable<Node> nodes = shortestPath.nodes();
-                Iterable<Relationship> relationships = shortestPath.relationships();
+                Iterable<Node> nodes = p.nodes();
+                Iterable<Relationship> relationships = p.relationships();
 
                 ArrayList<Node> nodeList = new ArrayList<Node>();
                 ArrayList<Relationship> relList = new ArrayList<Relationship>();
@@ -80,11 +80,6 @@ public class Navigation extends Endpoint {
                     pathToDestination.add(streetName);
                 }
 
-//
-//                System.out.println("AJSDFNAJKSFN " + shortestPath.end().asMap().get("properties").toString());
-//                JSONObject streetName = new JSONObject();
-//                streetName.put("street", nodeList.get(i).asMap().get("name"));
-
                 JSONObject data = new JSONObject();
                 data.put("total_time", time);
                 data.put("route", pathToDestination);
@@ -94,6 +89,7 @@ public class Navigation extends Endpoint {
                 res.put("data", data);
                 this.sendResponse(r, res, 200);
             } else {
+                System.out.println("not have next\n\n");
                 this.sendStatus(r, 404);
             }
         } catch (Exception e) {
