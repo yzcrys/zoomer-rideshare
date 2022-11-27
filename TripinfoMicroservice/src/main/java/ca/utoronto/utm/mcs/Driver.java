@@ -20,32 +20,29 @@ public class Driver extends Endpoint {
     public void handleGet(HttpExchange r) throws IOException, JSONException {
         try{
             String[] split1 = r.getRequestURI().getPath().split("/");
-            JSONArray res;
-
-            if (split1.length != 4 | split1[3].equals("")) {
+            if (split1.length != 4 || split1[3].isEmpty()) {
                 this.sendStatus(r, 400);
                 return;
             }
 
             String uidString = split1[3];
 
-            res = this.dao.getAllTrips(uidString);
-
-            if(0 == res.length()){
+            JSONArray rs;
+            rs = this.dao.getAllTrips(uidString, "driver");
+            if(rs.length() == 0){
                 this.sendStatus(r, 404);
                 return;
             }
 
-            JSONObject rData = new JSONObject();
+            JSONObject data = new JSONObject();
             JSONObject trips = new JSONObject();
 
-            trips.put("trips", res);
-            rData.put("data", trips);
-
-            this.sendResponse(r, rData, 200);
+            trips.put("trips", rs);
+            data.put("data", trips);
+            this.sendResponse(r, data, 200);
             return;
+
         }catch(Exception e) {
-            e.printStackTrace();
             this.sendStatus(r, 500);
         }
     }
