@@ -26,7 +26,7 @@ public class Register extends Endpoint {
 
         Class<?> fieldClasses[] = {String.class, String.class, String.class};
         if (!validateFields(body, fields, fieldClasses)) {
-            System.out.println("invalid fields for register user");
+//            System.out.println("invalid fields for register user");
             this.sendStatus(r, 400);
             return;
         }

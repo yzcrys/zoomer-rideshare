@@ -56,7 +56,7 @@ public class Login extends Endpoint {
             if (rs.getString("password").equals(password))
                 this.sendStatus(r, 200);
             else
-                this.sendStatus(r, 404);
+                this.sendStatus(r, 401);
         }
         catch (SQLException e) {
             e.printStackTrace();

@@ -18,6 +18,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.URI;
 import java.io.OutputStream;    // Also given to you to send back your response
+import java.time.Duration;
 import java.util.HashMap;
 
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
@@ -50,9 +51,9 @@ public class RequestRouter implements HttpHandler {
 		if (endPoint.contains("location"))
 			uri = "http://locationmicroservice:8000" + endPoint;
 		else if (endPoint.contains("trip"))
-			uri = "http://tripinfomicroservice:8002" + endPoint;
+			uri = "http://tripinfomicroservice:8000" + endPoint;
 		else if (endPoint.contains("user"))
-			uri = "http://usermicroservice:8001" + endPoint;
+			uri = "http://usermicroservice:8000" + endPoint;
 
 		HttpClient client = HttpClient.newHttpClient();
 
@@ -170,6 +171,7 @@ public class RequestRouter implements HttpHandler {
 				.uri(new URI(uriEndPoint))
 				.headers("Content-Type", "application/json")
 				.PUT(HttpRequest.BodyPublishers.ofString(body))
+				.timeout(Duration.ofSeconds(10))
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
 
@@ -177,6 +179,7 @@ public class RequestRouter implements HttpHandler {
 		return client.send(HttpRequest.newBuilder()
 				.uri(new URI(uriEndPoint))
 				.method("GET", noBody())
+				.timeout(Duration.ofSeconds(10))
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
 
@@ -185,6 +188,7 @@ public class RequestRouter implements HttpHandler {
 				.uri(new URI(uriEndPoint))
 				.headers("Content-Type", "application/json")
 				.method("POST", HttpRequest.BodyPublishers.ofString(body))
+				.timeout(Duration.ofSeconds(10))
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
 
@@ -192,7 +196,8 @@ public class RequestRouter implements HttpHandler {
 	public HttpResponse<String> sendHTTPReq(String method, HttpClient client, String uriEndPoint, String body) throws URISyntaxException, IOException, InterruptedException {
 		return client.send(HttpRequest.newBuilder()
 				.uri(new URI(uriEndPoint))
-				.method(method, HttpRequest.BodyPublishers.ofString(body))
+				.method(method, HttpRequest.BodyPublishers.ofString(body)).version(HttpClient.Version.HTTP_1_1)
+				.timeout(Duration.ofSeconds(10))
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
 }
