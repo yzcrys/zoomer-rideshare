@@ -8,6 +8,7 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +16,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 
 import static com.mongodb.client.model.Filters.eq;
 import static java.net.http.HttpRequest.BodyPublishers.noBody;
@@ -124,6 +126,22 @@ public class MongoDao {
 		}
 	}
 
+	public ArrayList<String> getOneTrip(ObjectId _id) {
+		FindIterable<Document> res = this.collection.find(Filters.eq("_id", _id));
+
+		ArrayList<String> resObj = new ArrayList<>();
+		try {
+			for (Document doc : res) {
+				resObj.add(doc.getString("driver"));
+				resObj.add(doc.getString("passenger"));
+			}
+
+			return resObj;
+		}catch (Exception e) {
+			throw e;
+		}
+	}
+
 	public JSONArray getAllTrips(String uid, String user) {
 		FindIterable<Document> found = this.collection.find(Filters.eq(user, uid));
 		try {
@@ -138,5 +156,23 @@ public class MongoDao {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+
+	public String getDriverTime(String driver, String passenger) throws URISyntaxException, IOException, InterruptedException {
+
+		HttpClient client = HttpClient.newHttpClient();
+		HttpResponse<String> response = null;
+		try {
+			response = sendGetReq(client, "http://locationmicroservice:8000/location/navigation/" + driver + "?passengerUid=" + passenger);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return "500";
+		}
+//		System.out.println(response.statusCode() + "\n\n");
+		if (response.statusCode() != 200 || response.body() == null || response.body().isEmpty()) {
+//			System.out.println(response.statusCode() + "\n\n");
+			return Integer.toString(response.statusCode());
+		}
+		return response.body();
 	}
 }
