@@ -12,17 +12,20 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 /**
  * Please write your tests in this class. 
  */
- 
+
 public class AppTest {
+
     public HttpResponse<String> sendPutReq(HttpClient client, String uriEndPoint, String body) throws URISyntaxException, IOException, InterruptedException {
         return client.send(HttpRequest.newBuilder()
                 .uri(new URI(uriEndPoint))
                 .headers("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.ofString(body))
+                .timeout(Duration.ofSeconds(10))
                 .build(), HttpResponse.BodyHandlers.ofString());
     }
 
@@ -30,6 +33,7 @@ public class AppTest {
         return client.send(HttpRequest.newBuilder()
                 .uri(new URI(uriEndPoint))
                 .method("GET", noBody())
+                .timeout(Duration.ofSeconds(10))
                 .build(), HttpResponse.BodyHandlers.ofString());
     }
 
@@ -38,6 +42,7 @@ public class AppTest {
                 .uri(new URI(uriEndPoint))
                 .headers("Content-Type", "application/json")
                 .method("POST", HttpRequest.BodyPublishers.ofString(body))
+                .timeout(Duration.ofSeconds(10))
                 .build(), HttpResponse.BodyHandlers.ofString());
     }
 
@@ -45,55 +50,157 @@ public class AppTest {
     public HttpResponse<String> sendHTTPReq(String method, HttpClient client, String uriEndPoint, String body) throws URISyntaxException, IOException, InterruptedException {
         return client.send(HttpRequest.newBuilder()
                 .uri(new URI(uriEndPoint))
-                .method(method, HttpRequest.BodyPublishers.ofString(body))
+                .method(method, HttpRequest.BodyPublishers.ofString(body)).version(HttpClient.Version.HTTP_1_1)
+                .timeout(Duration.ofSeconds(10))
                 .build(), HttpResponse.BodyHandlers.ofString());
     }
+
+//    @Test
+//    public void getNearbyDriverPass() throws URISyntaxException, IOException, InterruptedException, JSONException {
+//        HttpClient client = HttpClient.newHttpClient();
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"1\", \"is_driver\" : false }");
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"2\", \"is_driver\" : true }");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/1", "{\n" +
+//                " 'longitude': 1.0,\n" +
+//                " 'latitude': 1.0,\n" +
+//                " 'street': 'Street 1'\n" +
+//                "}");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/2", "{\n" +
+//                " 'longitude': 2.0,\n" +
+//                " 'latitude': 2.0,\n" +
+//                " 'street': 'Street 2'\n" +
+//                "}");
+//        HttpResponse response = sendGetReq(client, "http://localhost:8000/location/nearbyDriver/1?radius=2");
+//        String receivedResponse = response.body().toString();
+//        System.out.println(receivedResponse);
+//        String correctResponse = "{\"data\":{\"2\":{\"street\":\"Street 2\",\"latitude\":2,\"longitude\":2}},\"status\":\"OK\"}";
+//
+//        assertTrue(receivedResponse.equals(correctResponse) && response.statusCode() == 200);
+//    }
+//
+//    @Test
+//    public void getNearbyDriverFail() throws URISyntaxException, IOException, InterruptedException, JSONException {
+//        HttpClient client = HttpClient.newHttpClient();
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"3\", \"is_driver\" : false }");
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"4\", \"is_driver\" : true }");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/3", "{\n" +
+//                " 'longitude': 3.0,\n" +
+//                " 'latitude': 3.0,\n" +
+//                " 'street': 'Street 1'\n" +
+//                "}");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/4", "{\n" +
+//                " 'longitude': 4.0,\n" +
+//                " 'latitude': 4.0,\n" +
+//                " 'street': 'Street 3'\n" +
+//                "}");
+//        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/nearbyDriver/11123123123123212?radius=1");
+//        String receivedResponse = response.body().toString();
+////        System.out.println(receivedResponse);
+//        assertTrue(receivedResponse.equals("{\"status\":\"NOT FOUND\"}") && response.statusCode() == 404);
+//    }
+//
+//    @Test
+//    public void getNavigationPass() throws URISyntaxException, IOException, InterruptedException, JSONException {
+//        HttpClient client = HttpClient.newHttpClient();
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"5\", \"is_driver\" : false }");
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"6\", \"is_driver\" : true }");
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"7\", \"is_driver\" : true }");
+//        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"8\", \"is_driver\" : true }");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/5", "{\n" +
+//                " 'longitude': 5.0,\n" +
+//                " 'latitude': 5.0,\n" +
+//                " 'street': 'Street 5'\n" +
+//                "}");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/6", "{\n" +
+//                " 'longitude': 6.0,\n" +
+//                " 'latitude': 6.0,\n" +
+//                " 'street': 'Street 6'\n" +
+//                "}");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/7", "{\n" +
+//                " 'longitude': 7.0,\n" +
+//                " 'latitude': 7.0,\n" +
+//                " 'street': 'Street 7'\n" +
+//                "}");
+//        sendHTTPReq("PATCH", client, "http://localhost:8004/location/8", "{\n" +
+//                " 'longitude': 8.0,\n" +
+//                " 'latitude': 8.0,\n" +
+//                " 'street': 'Street 8'\n" +
+//                "}");
+//        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 5\", \"hasTraffic\" : false }");
+//        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 6\", \"hasTraffic\" : false }");
+//        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 7\", \"hasTraffic\" : false }");
+//        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 8\", \"hasTraffic\" : false }");
+//
+//        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 5\", \"roadName2\": \"Street 6\", \"hasTraffic\" : true, \"time\": 3 }");
+//        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 6\", \"roadName2\": \"Street 7\", \"hasTraffic\" : true, \"time\": 4 }");
+//        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 7\", \"roadName2\": \"Street 8\", \"hasTraffic\" : true, \"time\": 7 }");
+//        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 5\", \"roadName2\": \"Street 8\", \"hasTraffic\" : true, \"time\": 50 }");
+//
+//        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/navigation/8?passengerUid=5");
+//        String receivedResponse = response.body().toString();
+//        String correctResponse = "{\"data\":{\"route\":[{\"street\":\"Street 5\",\"is_traffic\":true,\"time\":0},{\"street\":\"Street 6\",\"is_traffic\":true,\"time\":3},{\"street\":\"Street 7\",\"is_traffic\":true,\"time\":4},{\"street\":\"Street 8\",\"is_traffic\":true,\"time\":7}],\"total_time\":\"14\"},\"status\":\"OK\"}";
+//        System.out.println(receivedResponse);
+//        assertTrue(receivedResponse.equals(correctResponse) && response.statusCode() == 200);
+//    }
+//
+//    @Test
+//    public void getNavigationFail() throws URISyntaxException, IOException, InterruptedException, JSONException {
+//        HttpClient client = HttpClient.newHttpClient();
+//        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/navigation/nav1123123?passengerUid=nav4");
+//        String receivedResponse = response.body().toString();
+//        assertTrue(receivedResponse.equals("{\"status\":\"NOT FOUND\"}") && response.statusCode() == 404);
+//    }
+//}
 
     @Test
     public void tripRequestPass() throws URISyntaxException, IOException, InterruptedException, JSONException {
         HttpClient client = HttpClient.newHttpClient();
-        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"req1\", \"is_driver\" : false }");
-        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"req2\", \"is_driver\" : true }");
-        sendPostReq( client, "http://localhost:8002/trip/request", "{ \"uid\": \"req1\", \"radius\": 2 }");
-        sendHTTPReq("PATCH", client, "http://localhost:8004/location/req1", "{\n" +
-                " 'longitude': 300.1,\n" +
-                " 'latitude': 300.1,\n" +
-                " 'street': 'Street req1'\n" +
+        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"10\", \"is_driver\" : false }");
+        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"11\", \"is_driver\" : true }");
+        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"12\", \"is_driver\" : true }");
+        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"13\", \"is_driver\" : true }");
+        sendHTTPReq("PATCH", client, "http://localhost:8004/location/10", "{\n" +
+                " 'longitude': 10.0,\n" +
+                " 'latitude': 10.0,\n" +
+                " 'street': 'Street 10'\n" +
                 "}");
-        sendHTTPReq("PATCH", client, "http://localhost:8004/location/req2", "{\n" +
-                " 'longitude': 301.1,\n" +
-                " 'latitude': 301.1,\n" +
-                " 'street': 'Street req2'\n" +
+        sendHTTPReq("PATCH", client, "http://localhost:8004/location/11", "{\n" +
+                " 'longitude': 11.0,\n" +
+                " 'latitude': 11.0,\n" +
+                " 'street': 'Street 11'\n" +
                 "}");
+        sendHTTPReq("PATCH", client, "http://localhost:8004/location/12", "{\n" +
+                " 'longitude': 12.0,\n" +
+                " 'latitude': 12.0,\n" +
+                " 'street': 'Street 12'\n" +
+                "}");
+        sendHTTPReq("PATCH", client, "http://localhost:8004/location/13", "{\n" +
+                " 'longitude': 13.0,\n" +
+                " 'latitude': 13.0,\n" +
+                " 'street': 'Street 13'\n" +
+                "}");
+        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 10\", \"hasTraffic\" : false }");
+        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 11\", \"hasTraffic\" : false }");
+        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 12\", \"hasTraffic\" : false }");
+        sendPutReq(client, "http://localhost:8004/location/road", "{ \"roadName\": \"Street 13\", \"hasTraffic\" : false }");
 
-        HttpResponse response = sendPostReq(client, "http://localhost:8002/trip/request", "{\n" +
-                "\t\"uid\": \"req1\", \n" +
-                "\t\"radius\": 2\n" +
-                "}");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 10\", \"roadName2\": \"Street 11\", \"hasTraffic\" : true, \"time\": 3 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 11\", \"roadName2\": \"Street 12\", \"hasTraffic\" : true, \"time\": 4 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 12\", \"roadName2\": \"Street 13\", \"hasTraffic\" : true, \"time\": 7 }");
+        sendHTTPReq("POST", client, "http://localhost:8004/location/hasRoute", "{ \"roadName1\": \"Street 10\", \"roadName2\": \"Street 13\", \"hasTraffic\" : true, \"time\": 50 }");
+
+        HttpResponse response = sendGetReq(client, "http://localhost:8004/location/navigation/13?passengerUid=10");
         String receivedResponse = response.body().toString();
-        String correctResponse = "{\"data\":{\"req2\":{\"street\":\"Street req2\",\"latitude\":301.1,\"longitude\":301.1},\"reqf2\":{\"street\":\"Street req2\",\"latitude\":301.1,\"longitude\":301.1}},\"status\":\"OK\"}";
+        String correctResponse = "{\"data\":{\"route\":[{\"street\":\"Street 10\",\"is_traffic\":true,\"time\":0},{\"street\":\"Street 11\",\"is_traffic\":true,\"time\":3},{\"street\":\"Street 12\",\"is_traffic\":true,\"time\":4},{\"street\":\"Street 13\",\"is_traffic\":true,\"time\":7}],\"total_time\":\"14\"},\"status\":\"OK\"}";
+        System.out.println(receivedResponse);
         assertTrue(receivedResponse.equals(correctResponse) && response.statusCode() == 200);
     }
 
     @Test
     public void tripRequestFail() throws URISyntaxException, IOException, InterruptedException, JSONException {
         HttpClient client = HttpClient.newHttpClient();
-        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"reqf1\", \"is_driver\" : false }");
-        sendPutReq(client, "http://localhost:8004/location/user", "{ \"uid\": \"reqf2\", \"is_driver\" : true }");
-        sendPostReq( client, "http://localhost:8002/trip/request", "{ \"uid\": \"reqf1\", \"radius\": 2 }");
-        sendHTTPReq("PATCH", client, "http://localhost:8004/location/reqf1", "{\n" +
-                " 'longitude': 300.1,\n" +
-                " 'latitude': 300.1,\n" +
-                " 'street': 'Street req1'\n" +
-                "}");
-        sendHTTPReq("PATCH", client, "http://localhost:8004/location/reqf2", "{\n" +
-                " 'longitude': 301.1,\n" +
-                " 'latitude': 301.1,\n" +
-                " 'street': 'Street req2'\n" +
-                "}");
-
         HttpResponse response = sendPostReq(client, "http://localhost:8002/trip/request", "{\n" +
-                "\t\"uid\": \"req43tdgdfgdfg1\", \n" +
+                "\t\"uid\": \"346678422\", \n" +
                 "\t\"radius\": 2\n" +
                 "}");
         String receivedResponse = response.body().toString();

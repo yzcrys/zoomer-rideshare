@@ -94,7 +94,7 @@ public class Neo4jDAO {
                 "WHERE point.distance(point({x: a.longitude, y: a.latitude}), point({x: b.longitude, y: b.latitude})) < %d " +
                 "AND a.uid <> b.uid " +
                 "RETURN b AS driver";
-        query = String.format(query, uid, radius);
+        query = String.format(query, uid, radius + 1);
         return this.session.run(query);
     }
 
