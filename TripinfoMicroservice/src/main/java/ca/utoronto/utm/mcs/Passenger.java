@@ -28,7 +28,7 @@ public class Passenger extends Endpoint {
             String uidString = split1[3];
 
             JSONArray rs;
-            rs = this.dao.getAllTrips(uidString);
+            rs = this.dao.getAllTrips(uidString, "passenger");
             if(rs.length() == 0){
                 this.sendStatus(r, 404);
                 return;

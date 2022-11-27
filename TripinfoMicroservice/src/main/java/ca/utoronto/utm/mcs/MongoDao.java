@@ -91,39 +91,47 @@ public class MongoDao {
 				.append("driver", driver)
 				.append("passenger", passenger)
 				.append("startTime", startTime);
-		collection.insertOne(doc);
-		return doc;
+		try {
+			this.collection.insertOne(doc);
+			return doc;
+		} catch (Exception e) {
+			throw  e;
+		}
 	}
 
 	// PATCH trip/_id
-	public int updateTripInfo(String _id, Integer distance, Integer endTime, Integer timeElapsed, Integer discount, Double totalCost, Double driverPayout) {
-		BasicDBObject query = new BasicDBObject();
-		BasicDBObject update = new BasicDBObject();
-		query.put("_id", new ObjectId(_id));
-		update.put("distance", distance);
-		update.put("endTime", endTime);
-		update.put("timeElapsed", timeElapsed);
-		update.put("discount", discount);
-		update.put("totalCost", totalCost);
-		update.put("driverPayout", driverPayout);
+	public int updateTripInfo(ObjectId _id, Integer distance, Integer endTime, Integer timeElapsed, Double discount, Double totalCost, Double driverPayout) {
+		Document doc = new Document()
+				.append("distance", distance)
+				.append("endTime", endTime)
+				.append("timeElapsed", timeElapsed)
+				.append("discount", discount)
+				.append("totalCost", totalCost)
+				.append("driverPayout", driverPayout);
 
-		DBObject dbObj = (DBObject) collection.findOneAndUpdate(query, update);
-
-		if (dbObj == null || dbObj.equals(null)) {
-			return 404;
+		try{
+			if(!checkTripExists(_id)){
+				return 404;
+			}
+		}catch (Exception e) {
+			throw e;
 		}
-		return 200;
+		try {
+			this.collection.updateOne(Filters.eq("_id", _id), new Document("$set", doc));
+			return 200;
+		}catch (Exception e) {
+			throw e;
+		}
 	}
 
-	public JSONArray getAllTrips(String uid) {
-
-		FindIterable<Document> found = this.collection.find(Filters.eq("driver", uid));
+	public JSONArray getAllTrips(String uid, String user) {
+		FindIterable<Document> found = this.collection.find(Filters.eq(user, uid));
 		try {
 			JSONArray res = new JSONArray();
 
 			for (Document doc : found) {
-				doc.put("_id",doc.getObjectId("_id").toString());
-				doc.remove("driver");
+				doc.put("_id", doc.getObjectId("_id").toString());
+				doc.remove(user);
 				res.put(doc);
 			}
 			return res;
