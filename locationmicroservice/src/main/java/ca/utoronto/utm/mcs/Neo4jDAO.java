@@ -97,4 +97,17 @@ public class Neo4jDAO {
         query = String.format(query, uid, radius);
         return this.session.run(query);
     }
+
+    public Result getNavigation(String driverUid, String passengerUid) {
+
+        String query = "MATCH(a:user{uid: '%s'}), (b:user{uid: '%s'})\n" +
+                "MATCH(r1:road{name: a.street}), (r2:road{name: b.street}),\n" +
+                "    path = allShortestPaths((r1)-[:ROUTE_TO*]->(r2))\n" +
+                "RETURN path AS shortestPath,\n" +
+                "    reduce(EstimatedTime=0, r in relationships(path) | EstimatedTime+r.travel_time) AS time\n" +
+                "ORDER BY time ASC\n" +
+                "LIMIT 1";
+        query = String.format(query, driverUid, passengerUid);
+        return this.session.run(query);
+    }
 }

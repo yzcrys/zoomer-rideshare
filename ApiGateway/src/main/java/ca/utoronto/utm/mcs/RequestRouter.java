@@ -60,47 +60,63 @@ public class RequestRouter implements HttpHandler {
 
 		switch (method) {
 			case "GET" -> {
+				HttpResponse response = null;
 				try {
-					HttpResponse response = sendGetReq(client, uri);
+					response = sendGetReq(client, uri);
 					this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
 
 				} catch (URISyntaxException | InterruptedException | JSONException e) {
+					try {
+						this.sendStatus(r, response.statusCode());
+					} catch (JSONException ex) {
+						throw new RuntimeException(ex);
+					}
 					throw new RuntimeException(e);
 				}
 			}
 			case "PUT" -> {
+				HttpResponse response = null;
 				try {
 					String reqBody = Utils.convert(r.getRequestBody());
-					HttpResponse response = sendPutReq(client, uri, reqBody);
+					response = sendPutReq(client, uri, reqBody);
 					this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
 
-				} catch (URISyntaxException | JSONException e) {
-					throw new RuntimeException(e);
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | URISyntaxException | JSONException e) {
+					try {
+						this.sendStatus(r, response.statusCode());
+					} catch (JSONException ex) {
+						throw new RuntimeException(ex);
+					}
 					throw new RuntimeException(e);
 				}
 			}
 			case "POST" -> {
+				HttpResponse response = null;
 				try {
 					String reqBody = Utils.convert(r.getRequestBody());
-					HttpResponse response = sendPostReq(client, uri, reqBody);
+					response = sendPostReq(client, uri, reqBody);
 
 					if (response.body() == null || response.body().toString().isEmpty())
 						this.sendStatus(r, response.statusCode());
 					else
 						this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
 
-				} catch (URISyntaxException | JSONException e) {
-					throw new RuntimeException(e);
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | URISyntaxException | JSONException e) {
+					try {
+						this.sendStatus(r, response.statusCode());
+					} catch (JSONException ex) {
+						throw new RuntimeException(ex);
+					}
 					throw new RuntimeException(e);
 				}
 			}
 			case "DELETE", "PATCH" -> {
+				HttpResponse response = null;
 				try {
 					String reqBody = Utils.convert(r.getRequestBody());
 					System.out.println("before sending request");
-					HttpResponse response = sendHTTPReq(method, client, uri, reqBody);;
+					response = sendHTTPReq(method, client, uri, reqBody);
+					;
 					System.out.println("apigateway response: " + response.body().toString());
 					System.out.println("\napigateway status code: " + response.statusCode());
 					if (response.body() == null || response.body().toString().isEmpty())
@@ -108,15 +124,22 @@ public class RequestRouter implements HttpHandler {
 					else
 						this.sendResponse(r, new JSONObject(response.body().toString()), response.statusCode());
 
-				} catch (URISyntaxException | JSONException e) {
-					throw new RuntimeException(e);
-				} catch (InterruptedException e) {
+				} catch (InterruptedException | URISyntaxException | JSONException e) {
+					try {
+						this.sendStatus(r, response.statusCode());
+					} catch (JSONException ex) {
+						throw new RuntimeException(ex);
+					}
 					throw new RuntimeException(e);
 				}
 			}
 			default -> {
 //                System.out.println("ReqHandler: handleGet() Error");
-				r.sendResponseHeaders(404, -1);
+				try {
+					this.sendStatus(r, 404);
+				} catch (JSONException e) {
+					throw new RuntimeException(e);
+				}
 			}
 		}
 	}
@@ -172,5 +195,4 @@ public class RequestRouter implements HttpHandler {
 				.method(method, HttpRequest.BodyPublishers.ofString(body))
 				.build(), HttpResponse.BodyHandlers.ofString());
 	}
-
 }
